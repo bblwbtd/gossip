@@ -7,7 +7,7 @@ const Skip = -2
 type Message struct {
 	Data     float64 `json:"data"`
 	From     string  `json:"from"`
-	Callback func(response *Response)
+	Callback chan *Response
 }
 
 type Response struct {

@@ -33,25 +33,23 @@ func GetMaxValue() float64 {
 
 func GetMaxRound() int {
 	max := 0
-	nodeTable.Range(func(key, value interface{}) bool {
-		node := value.(*app.Node)
-		if len(node.Records) > max {
-			max = len(node.Records)
+	temp := GetSenderRoundMap()
+	for _, v := range temp {
+		if v > max {
+			max = v
 		}
-		return true
-	})
+	}
 	return max
 }
 
 func GetMinRound() int {
 	min := math.MaxInt32
-	nodeTable.Range(func(key, value interface{}) bool {
-		node := value.(*app.Node)
-		if len(node.Records) < min {
-			min = len(node.Records)
+	temp := GetSenderRoundMap()
+	for _, v := range temp {
+		if v < min {
+			min = v
 		}
-		return true
-	})
+	}
 	return min
 }
 
@@ -93,14 +91,11 @@ func GetDecay() float64 {
 
 func GetMeanRound() float64 {
 	round := 0.0
-	count := 0.0
-	nodeTable.Range(func(key, value interface{}) bool {
-		node := value.(*app.Node)
-		round = round + float64(len(node.Records))
-		count++
-		return true
-	})
-	return round / count
+	temp := GetSenderRoundMap()
+	for _, v := range temp {
+		round = round + float64(v)
+	}
+	return round / float64(len(temp))
 }
 
 func GetRecordsByNodeAmount() map[string][]*record.ExperimentRecord {
@@ -130,4 +125,16 @@ func GetAllRecords() []*record.ExperimentRecord {
 		return true
 	})
 	return result
+}
+
+func GetSenderRoundMap() map[string]int {
+	temp := make(map[string]int)
+	nodeTable.Range(func(key, value interface{}) bool {
+		node := value.(*app.Node)
+		for _, n := range node.Records {
+			temp[n.Sender]++
+		}
+		return true
+	})
+	return temp
 }

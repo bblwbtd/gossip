@@ -24,6 +24,7 @@ var commands = map[string]string{
 }
 
 func main() {
+	runtime.GOMAXPROCS(16)
 	go BroadcastEvent()
 	go func() {
 		Open("http://localhost:2333")
@@ -37,6 +38,7 @@ func main() {
 	}
 }
 
+//打开浏览器
 func Open(uri string) error {
 	run, ok := commands[runtime.GOOS]
 	if !ok {
@@ -47,11 +49,13 @@ func Open(uri string) error {
 	return cmd.Start()
 }
 
+//添加节点
 func AddNode(config *model.NodeConfig) {
 	node := app.NewNode(config, messageChannel, outputChannel, GlobalState)
 	nodeTable.Store(node.ID, node)
 }
 
+//批量添加节点
 func AddNodeBatch(config *model.NodeConfig, amount int) {
 	for i := 0; i < amount; i++ {
 		AddNode(config)
